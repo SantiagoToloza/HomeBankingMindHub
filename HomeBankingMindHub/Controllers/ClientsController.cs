@@ -1,63 +1,37 @@
-﻿using HomeBankingMindHub.dtos;
-
-using HomeBankingMindHub.Models;
-
+﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
-
 using Microsoft.AspNetCore.Http;
-
 using Microsoft.AspNetCore.Mvc;
-
-using System;
-
 using System.Collections.Generic;
-
+using System;
 using System.Linq;
-
-
+using HomeBankingMindHub.dtos;
 
 namespace HomeBankingMindHub.Controllers
-
 {
-
     [Route("api/[controller]")]
-
     [ApiController]
-
     public class ClientsController : ControllerBase
-
     {
-
         private IClientRepository _clientRepository;
-
-
 
         public ClientsController(IClientRepository clientRepository)
 
         {
-
             _clientRepository = clientRepository;
-
         }
-
-
 
         [HttpGet]
 
         public IActionResult Get()
 
         {
-
             try
 
             {
-
                 var clients = _clientRepository.GetAllClients();
 
-
-
                 var clientsDTO = new List<ClientDTO>();
-
 
 
                 foreach (Client client in clients)
@@ -67,7 +41,6 @@ namespace HomeBankingMindHub.Controllers
                     var newClientDTO = new ClientDTO
 
                     {
-
                         Id = client.Id,
 
                         Email = client.Email,
@@ -79,7 +52,6 @@ namespace HomeBankingMindHub.Controllers
                         Accounts = client.Accounts.Select(ac => new AccountDTO
 
                         {
-
                             Id = ac.Id,
 
                             Balance = ac.Balance,
@@ -92,14 +64,9 @@ namespace HomeBankingMindHub.Controllers
 
                     };
 
-
-
                     clientsDTO.Add(newClientDTO);
 
                 }
-
-
-
 
 
                 return Ok(clientsDTO);
@@ -127,17 +94,12 @@ namespace HomeBankingMindHub.Controllers
             try
 
             {
-
                 var client = _clientRepository.FindById(id);
+
 
                 if (client == null)
 
-                {
-
-                    return Forbid();
-
-                }
-
+                { return NotFound(); }
 
 
                 var clientDTO = new ClientDTO
@@ -155,7 +117,6 @@ namespace HomeBankingMindHub.Controllers
                     Accounts = client.Accounts.Select(ac => new AccountDTO
 
                     {
-
                         Id = ac.Id,
 
                         Balance = ac.Balance,
@@ -167,8 +128,6 @@ namespace HomeBankingMindHub.Controllers
                     }).ToList()
 
                 };
-
-
 
                 return Ok(clientDTO);
 
@@ -183,7 +142,5 @@ namespace HomeBankingMindHub.Controllers
             }
 
         }
-
     }
-
 }

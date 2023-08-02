@@ -1,15 +1,11 @@
 ﻿using HomeBankingMindHub.Models;
-
 using System;
+using System.Collections.Generic;
 
-namespace HomeBankingMindHub.dtos
-
+namespace HomeBankingMindHub.Models
 {
-
     public class AccountDTO
-
     {
-
         public long Id { get; set; }
 
         public string Number { get; set; }
@@ -18,7 +14,6 @@ namespace HomeBankingMindHub.dtos
 
         public double Balance { get; set; }
 
+        public ICollection<TransactionDTO> Transactions { get; set; }
     }
-
 }
-

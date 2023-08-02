@@ -7,7 +7,6 @@ namespace HomeBankingMindHub.Models
     public class DBInitializer
     {
         public static void Initialize(HomeBankingContext context)
-
         {
             if (!context.Accounts.Any())
             {
@@ -23,58 +22,72 @@ namespace HomeBankingMindHub.Models
                         context.Accounts.Add(account);
                     }
                     context.SaveChanges();
-
                 }
             }
-
 
             if (!context.Accounts.Any())
             {
-                if (!context.Accounts.Any())
+                var random = new Random();
+
+                // Obtener todos los clientes de la base de datos
+                var clients = context.Clients.ToList();
+
+                foreach (var client in clients)
                 {
-                    var random = new Random();
+                    int numberClient = random.Next(1, 5); // Generar un número aleatorio de cuentas por cliente
+                    var accounts = new List<Account>();
 
-                    // Obtener todos los clientes de la base de datos
-                    var clients = context.Clients.ToList();
-
-                    foreach (var client in clients)
+                    for (int i = 0; i < numberClient; i++)
                     {
-                        int numberClient = random.Next(1, 5); // Generar un número aleatorio de cuentas por cliente
-
-                        var accounts = new List<Account>();
-
-                        for (int i = 0; i < numberClient; i++)
+                        string accountNumber = random.Next(100, 1000).ToString();
+                        var account = new Account
                         {
-                            string accountNumber = random.Next(100, 1000).ToString();
-
-                            var account = new Account
-                            {
-                                ClientId = client.Id,
-                                CreationDate = DateTime.Now,
-                                Number = accountNumber,
-                                Balance = 10000
-                            };
-
-                            accounts.Add(account);
-                        }
-
-                        // Agregar todas las cuentas del cliente actual al contexto
-                        context.Accounts.AddRange(accounts);
+                            ClientId = client.Id,
+                            CreationDate = DateTime.Now,
+                            Number = accountNumber,
+                            Balance = 10000
+                        };
+                        accounts.Add(account);
                     }
 
-                    // Guardar todos los cambios en la base de datos
+                    // Agregar todas las cuentas del cliente actual al contexto
+                    context.Accounts.AddRange(accounts);
+                }
+
+                // Guardar todos los cambios en la base de datos
+                context.SaveChanges();
+            }
+
+            if (!context.Transactions.Any())
+            {
+                var account1 = context.Accounts.FirstOrDefault(c => c.Number == "VIN001");
+
+                if (account1 != null)
+                {
+                    var transactions = new Transaction[]
+                    {
+                        new Transaction { AccountId = account1.Id, Amount = 100000, Date = DateTime.Now.AddHours(-4), Description = "Transferencia recibida", Type = TransactionType.CREDIT.ToString() },
+                        new Transaction { AccountId = account1.Id, Amount = -20000, Date = DateTime.Now.AddHours(-6), Description = "Compra en tienda mercado libre por un auto", Type = TransactionType.DEBIT.ToString() },
+                        new Transaction { AccountId = account1.Id, Amount = -300, Date = DateTime.Now.AddHours(-8), Description = "Compra en tienda amazon", Type = TransactionType.DEBIT.ToString() },
+                    };
+
+                    foreach (Transaction transaction in transactions)
+                    {
+                        context.Transactions.Add(transaction);
+                    }
+
                     context.SaveChanges();
                 }
             }
+
             if (!context.Clients.Any())
             {
                 var clients = new Client[]
                 {
-                    new Client { Email = "vcoronado@gmail.com", FirstName="Victor", LastName="Coronado", Password="123456"},
-                    new Client { Email = "santiago.b.toloza@gmail.com", FirstName="Santiago", LastName="Toloza", Password="abcdef"},
-                    new Client { Email = "ErnestoPerez@gmail.com", FirstName="Ernesto", LastName="Perez", Password="abcdef"},
-                    new Client { Email = "abc@gmail.com", FirstName="ab", LastName="c", Password="qwerty"},
-
+                    new Client { Email = "vcoronado@gmail.com", FirstName = "Victor", LastName = "Coronado", Password = "123456" },
+                    new Client { Email = "santiago.b.toloza@gmail.com", FirstName = "Santiago", LastName = "Toloza", Password = "abcdef" },
+                    new Client { Email = "ErnestoPerez@gmail.com", FirstName = "Ernesto", LastName = "Perez", Password = "abcdef" },
+                    new Client { Email = "abc@gmail.com", FirstName = "ab", LastName = "c", Password = "qwerty" },
                 };
 
                 foreach (Client client in clients)
@@ -82,14 +95,31 @@ namespace HomeBankingMindHub.Models
                     context.Clients.Add(client);
                 }
 
-
-
-
-
                 //guardamos
                 context.SaveChanges();
             }
 
+            if (!context.Transactions.Any())
+            {
+                var account1 = context.Accounts.FirstOrDefault(c => c.Number == "VIN001");
+
+                if (account1 != null)
+                {
+                    var transactions = new Transaction[]
+                    {
+                        new Transaction { AccountId = account1.Id, Amount = 10000, Date = DateTime.Now.AddHours(-5), Description = "Transferencia recibida", Type = TransactionType.CREDIT.ToString() },
+                        new Transaction { AccountId = account1.Id, Amount = -2000, Date = DateTime.Now.AddHours(-6), Description = "Compra en tienda mercado libre", Type = TransactionType.DEBIT.ToString() },
+                        new Transaction { AccountId = account1.Id, Amount = -3000, Date = DateTime.Now.AddHours(-7), Description = "Compra en tienda xxxx", Type = TransactionType.DEBIT.ToString() },
+                    };
+
+                    foreach (Transaction transaction in transactions)
+                    {
+                        context.Transactions.Add(transaction);
+                    }
+
+                    context.SaveChanges();
+                }
+            }
         }
     }
 }

@@ -9,14 +9,12 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace HomeBankingMindHub
 {
     public class Startup
     {
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -29,23 +27,11 @@ namespace HomeBankingMindHub
         {
 
             services.AddRazorPages();
-            services.AddControllers().AddJsonOptions(x =>
-
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
-
-
-
-            //agregamos el contexto ******
-
+            
             services.AddDbContext<HomeBankingContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("HomeBankingConexion")));
-
-            //****************************
-
-
-
-            services.AddScoped<IClientRepository, ClientRepository>();
-            services.AddDbContext<HomeBankingContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("HomeBankingConexion")));
+            services.AddScoped<IAccountRepository, AccountRepository>();
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -68,7 +54,6 @@ namespace HomeBankingMindHub
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapControllers();
             });
         }
     }
