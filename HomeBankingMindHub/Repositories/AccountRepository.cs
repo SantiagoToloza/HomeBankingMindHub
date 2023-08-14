@@ -1,31 +1,43 @@
-﻿using HomeBankingMindHub.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
+﻿using HomeBankingMindHub.dtos;
+using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Drawing;
 
-namespace HomeBankingMindHub.Repositories
+namespace HomeBankingMindHub.Controllers
 {
-    public class AccountRepository : RepositoryBase<Account>, IAccountRepository
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CardsController : ControllerBase
     {
-        public AccountRepository(HomeBankingContext repositoryContext) : base(repositoryContext)
+        private ICardRepository _cardRepository;
+        public CardsController(ICardRepository cardRepository)
         {
+            _cardRepository = cardRepository;
         }
-        public Account FindById(long id)
+        public IActionResult Post(Card newCard)
         {
-            return FindByCondition(account => account.Id == id)
-                .Include(account => account.Transactions)
-                .FirstOrDefault();
-        }
-        public IEnumerable<Account> GetAllAccounts()
-        {
-            return FindAll()
-                .Include(account => account.Transactions)
-                .ToList();
-        }
-        public void Save(Account account)
-        {
-            Create(account);
-            SaveChanges();
+            try
+            {
+                _cardRepository.Save(newCard);
+                CardDTO newcardDTO = new CardDTO
+                {
+                    CardHolder = newCard.CardHolder,
+                    Type = newCard.Type,
+                    Color = newCard.Color,
+                    Number = newCard.Number,
+                    Cvv = newCard.Cvv,
+                    FromDate = newCard.FromDate,
+                    ThruDate = newCard.ThruDate,
+                };
+                return Created("", newcardDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
