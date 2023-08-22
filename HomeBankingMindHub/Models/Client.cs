@@ -1,43 +1,23 @@
-﻿using HomeBankingMindHub.dtos;
-using HomeBankingMindHub.Models;
-using HomeBankingMindHub.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Drawing;
+﻿using System.Collections.Generic;
 
-namespace HomeBankingMindHub.Controllers
+namespace HomeBankingMindHub.Models
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CardsController : ControllerBase
+    public class Client
     {
-        private ICardRepository _cardRepository;
-        public CardsController(ICardRepository cardRepository)
-        {
-            _cardRepository = cardRepository;
-        }
-        public IActionResult Post(Card newCard)
-        {
-            try
-            {
-                _cardRepository.Save(newCard);
-                CardDTO newcardDTO = new CardDTO
-                {
-                    CardHolder = newCard.CardHolder,
-                    Type = newCard.Type,
-                    Color = newCard.Color,
-                    Number = newCard.Number,
-                    Cvv = newCard.Cvv,
-                    FromDate = newCard.FromDate,
-                    ThruDate = newCard.ThruDate,
-                };
-                return Created("", newcardDTO);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+        public long Id { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+
+        public ICollection<Account> Accounts { get; set; }
+
+        public ICollection<ClientLoan> Credits { get; set; }
+
+        public ICollection<Card> Cards { get; set; }
     }
 }

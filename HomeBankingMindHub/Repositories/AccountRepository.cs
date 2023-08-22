@@ -1,43 +1,56 @@
-﻿using HomeBankingMindHub.dtos;
-using HomeBankingMindHub.Models;
-using HomeBankingMindHub.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Drawing;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace HomeBankingMindHub.Controllers
+namespace HomeBankingMindHub.Repositories
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CardsController : ControllerBase
+    public class AccountRepository : RepositoryBase<Account>, IAccountRepository
     {
-        private ICardRepository _cardRepository;
-        public CardsController(ICardRepository cardRepository)
+        public AccountRepository(HomeBankingContext repositoryContext) : base(repositoryContext)
         {
-            _cardRepository = cardRepository;
         }
-        public IActionResult Post(Card newCard)
+
+        public Account FindById(long id)
         {
-            try
+            return FindByCondition(account => account.Id == id)
+                .Include(account => account.Transactions)
+                .FirstOrDefault();
+        }
+
+        public IEnumerable<Account> GetAllAccounts()
+        {
+            return FindAll()
+                .Include(account => account.Transactions)
+                .ToList();
+        }
+
+        public void Save(Account account)
+        {
+            if (account.Id == 0)
             {
-                _cardRepository.Save(newCard);
-                CardDTO newcardDTO = new CardDTO
-                {
-                    CardHolder = newCard.CardHolder,
-                    Type = newCard.Type,
-                    Color = newCard.Color,
-                    Number = newCard.Number,
-                    Cvv = newCard.Cvv,
-                    FromDate = newCard.FromDate,
-                    ThruDate = newCard.ThruDate,
-                };
-                return Created("", newcardDTO);
+                Create(account);
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, ex.Message);
+                Update(account);
             }
+            SaveChanges();
+        }
+
+        public IEnumerable<Account> GetAccountsByClient(long clientId)
+        {
+            return FindByCondition(account => account.ClientId == clientId)
+            .Include(account => account.Transactions)
+            .ToList();
+        }
+
+        public Account FindByNumber(string number)
+        {
+            return FindByCondition(account => account.Number.ToUpper() == number.ToUpper())
+            .Include(account => account.Transactions)
+            .FirstOrDefault();
         }
     }
 }

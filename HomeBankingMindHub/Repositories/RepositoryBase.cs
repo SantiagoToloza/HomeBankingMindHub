@@ -1,17 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
-using System.Linq;
-using System;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace HomeBankingMindHub.Repositories
 {
-
     public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
         protected HomeBankingContext RepositoryContext { get; set; }
-
         public RepositoryBase(HomeBankingContext repositoryContext)
         {
             this.RepositoryContext = repositoryContext;
@@ -26,7 +25,6 @@ namespace HomeBankingMindHub.Repositories
         public IQueryable<T> FindAll(Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null)
         {
             IQueryable<T> queryable = this.RepositoryContext.Set<T>();
-
             if (includes != null)
             {
                 queryable = includes(queryable);
@@ -59,5 +57,4 @@ namespace HomeBankingMindHub.Repositories
             this.RepositoryContext.SaveChanges();
         }
     }
-
 }
